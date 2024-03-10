@@ -2,3 +2,4 @@
 
 - VPC
 - Subnet
+- Internet Gateway
