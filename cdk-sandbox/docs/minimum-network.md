@@ -1,0 +1,4 @@
+# MinimumNetwork
+
+- VPC
+- Subnet
