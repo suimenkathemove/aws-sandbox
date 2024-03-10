@@ -7,11 +7,11 @@ cdk bootstrap --profile $AWS_PROFILE
 
 [tasks.deploy]
 script = '''
-cdk deploy --profile $AWS_PROFILE ${@}
+cdk deploy --profile $AWS_PROFILE $STACK
 '''
 dependencies = ["bootstrap"]
 
 [tasks.destroy]
 script = '''
-cdk destroy --profile $AWS_PROFILE ${@}
+cdk destroy --profile $AWS_PROFILE $STACK
 '''
