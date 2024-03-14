@@ -1,0 +1,9 @@
+# TODO
+
+# === Docker ===
+
+[tasks.hello-world]
+script = "docker compose run --rm run aws sts get-caller-identity"
+
+[tasks.run]
+script = "docker compose run --rm run /bin/bash"
