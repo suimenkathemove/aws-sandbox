@@ -6,4 +6,4 @@ node_modules
 cdk.out
 
 .env.*
-!.env.development.example
+!.env.example

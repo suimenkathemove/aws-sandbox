@@ -1,9 +1,15 @@
-# TODO
+env_files = [{ path = "./.env.development", profile = "development" }]
+
+[tasks.aws]
+script = "docker run --rm -it -v ~/.aws:/root/.aws amazon/aws-cli ${@} --profile $AWS_PROFILE"
+
+[tasks.account-id]
+script = "makers aws 'sts get-caller-identity'"
 
 # === Docker ===
 
-[tasks.hello-world]
+[tasks.docker-account-id]
 script = "docker compose run --rm run aws sts get-caller-identity"
 
-[tasks.run]
+[tasks.docker-run]
 script = "docker compose run --rm run /bin/bash"
