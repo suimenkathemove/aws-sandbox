@@ -5,3 +5,4 @@
 3. Ingress Subnetを作成する
    1. route tableを割り当てる
       1. default gatewayのrouteを追加する
+4. EC2 instanceを作成する
