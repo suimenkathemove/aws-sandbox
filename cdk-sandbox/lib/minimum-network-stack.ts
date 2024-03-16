@@ -122,6 +122,13 @@ export class MinimumNetworkStack extends cdk.Stack {
         instanceType,
         // TODO: 環境変数
         keyName: "MyKeyPair",
+        userData: cdk.Fn.base64(
+          `#!/bin/bash
+          sudo dnf update -y
+          sudo dnf install -y httpd
+          sudo systemctl start httpd
+          sudo systemctl enable httpd`,
+        ),
         tags: tags(instanceId),
       });
 
