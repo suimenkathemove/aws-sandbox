@@ -22,6 +22,9 @@ export class MinimumNetworkStack extends cdk.Stack {
       const vpcId = `${DOMAIN_NAME}-vpc`;
       const vpc = new cdk.aws_ec2.CfnVPC(this, vpcId, {
         cidrBlock: "10.0.0.0/16" satisfies CidrBlock,
+        // option: EC2インスタンスなどのリソースにホスト名が割り当てられるようになる
+        // enableDnsHostnames: true,
+        // enableDnsSupport: true,
         tags: tags(vpcId),
       });
 
