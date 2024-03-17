@@ -92,10 +92,16 @@ export class MinimumNetworkStack extends cdk.Stack {
           securityGroupIngress: [
             {
               ipProtocol: "tcp",
-              // TODO: 環境変数
+              // TODO: クライアントのIPアドレスにする。環境変数にする
               cidrIp: "0.0.0.0/0" satisfies CidrBlock,
               fromPort: 22,
               toPort: 22,
+            },
+            {
+              ipProtocol: "tcp",
+              cidrIp: "0.0.0.0/0" satisfies CidrBlock,
+              fromPort: 80,
+              toPort: 80,
             },
           ],
           tags: tags(securityGroupId),
