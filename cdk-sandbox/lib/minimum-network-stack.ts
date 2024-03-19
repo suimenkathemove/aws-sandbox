@@ -101,6 +101,12 @@ export class MinimumNetworkStack extends cdk.Stack {
               toPort: 22,
             },
             {
+              ipProtocol: "icmp",
+              fromPort: -1,
+              toPort: -1,
+              cidrIp: "0.0.0.0/0" satisfies CidrBlock,
+            },
+            {
               ipProtocol: "tcp",
               cidrIp: "0.0.0.0/0" satisfies CidrBlock,
               fromPort: 80,
@@ -198,16 +204,16 @@ export class MinimumNetworkStack extends cdk.Stack {
               toPort: 22,
             },
             {
-              ipProtocol: "tcp",
-              cidrIp: "0.0.0.0/0" satisfies CidrBlock,
-              fromPort: 3306,
-              toPort: 3306,
-            },
-            {
               ipProtocol: "icmp",
               fromPort: -1,
               toPort: -1,
               cidrIp: "0.0.0.0/0" satisfies CidrBlock,
+            },
+            {
+              ipProtocol: "tcp",
+              cidrIp: "0.0.0.0/0" satisfies CidrBlock,
+              fromPort: 3306,
+              toPort: 3306,
             },
           ],
           tags: tags(securityGroupId),
