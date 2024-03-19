@@ -72,7 +72,7 @@ export class MinimumNetworkStack extends cdk.Stack {
           },
         );
 
-        new cdk.aws_ec2.CfnRoute(this, `${DOMAIN_NAME}-default-gateway-route`, {
+        new cdk.aws_ec2.CfnRoute(this, `${subnetId}-default-gateway-route`, {
           routeTableId: routeTable.ref,
           destinationCidrBlock: "0.0.0.0/0" satisfies CidrBlock,
           gatewayId: igw.ref,
@@ -154,6 +154,19 @@ export class MinimumNetworkStack extends cdk.Stack {
       return instance;
     })();
 
+    const natGateway = ((): cdk.aws_ec2.CfnNatGateway => {
+      const natGatewayId = `${DOMAIN_NAME}-nat-gateway`;
+
+      const eip = new cdk.aws_ec2.CfnEIP(this, `${natGatewayId}-eip`);
+
+      const natGateway = new cdk.aws_ec2.CfnNatGateway(this, natGatewayId, {
+        subnetId: webServerSubnetAndRouteTable.subnet.ref,
+        allocationId: eip.attrAllocationId,
+      });
+
+      return natGateway;
+    })();
+
     const dbServerSubnetAndRouteTable = ((): {
       subnet: cdk.aws_ec2.CfnSubnet;
       routeTable: cdk.aws_ec2.CfnRouteTable;
@@ -180,6 +193,12 @@ export class MinimumNetworkStack extends cdk.Stack {
             routeTableId: routeTable.ref,
           },
         );
+
+        new cdk.aws_ec2.CfnRoute(this, `${subnetId}-nat-gateway-route`, {
+          routeTableId: routeTable.ref,
+          destinationCidrBlock: "0.0.0.0/0" satisfies CidrBlock,
+          natGatewayId: natGateway.ref,
+        });
 
         return routeTable;
       })();
