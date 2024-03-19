@@ -1,17 +1,11 @@
 env_files = [{ path = "./.env.development", profile = "development" }]
 
 [tasks.bootstrap]
-script = '''
-cdk bootstrap --profile $AWS_PROFILE
-'''
+script = "cdk bootstrap --profile $AWS_PROFILE"
 
 [tasks.deploy]
-script = '''
-cdk deploy --profile $AWS_PROFILE ${@}
-'''
+script = "cdk deploy --profile $AWS_PROFILE $STACK"
 dependencies = ["bootstrap"]
 
 [tasks.destroy]
-script = '''
-cdk destroy --profile $AWS_PROFILE ${@}
-'''
+script = "cdk destroy --profile $AWS_PROFILE $STACK"
