@@ -2,7 +2,7 @@ import * as cdk from "aws-cdk-lib";
 import { InstanceClass, InstanceSize } from "aws-cdk-lib/aws-ec2";
 import { Construct } from "constructs";
 
-import { CidrBlock } from "@/models/network";
+import { CidrBlock, IpV4 } from "@/models/network";
 import { tags } from "@/models/tags";
 
 const DOMAIN_NAME = "minimum-network";
@@ -122,7 +122,7 @@ export class MinimumNetworkStack extends cdk.Stack {
             deviceIndex: "0",
             subnetId: webServerSubnetAndRouteTable.subnet.ref,
             // MEMO: x.x.x.0~x.x.x.3は予約されている
-            privateIpAddress: "10.0.0.10",
+            privateIpAddress: "10.0.0.10" satisfies IpV4,
             associatePublicIpAddress: true,
             groupSet: [webServerSecurityGroup.ref],
           },
@@ -138,6 +138,94 @@ export class MinimumNetworkStack extends cdk.Stack {
           sudo systemctl start httpd
           sudo systemctl enable httpd`,
         ),
+        tags: tags(instanceId),
+      });
+
+      const _eip = new cdk.aws_ec2.CfnEIP(this, `${instanceId}-eip`, {
+        instanceId: instance.ref,
+      });
+
+      return instance;
+    })();
+
+    const dbServerSubnetAndRouteTable = ((): {
+      subnet: cdk.aws_ec2.CfnSubnet;
+      routeTable: cdk.aws_ec2.CfnRouteTable;
+    } => {
+      const subnetId = `${DOMAIN_NAME}-db-server-subnet`;
+      const subnet = new cdk.aws_ec2.CfnSubnet(this, subnetId, {
+        vpcId: vpc.ref,
+        cidrBlock: "10.0.1.0/24" satisfies CidrBlock,
+        tags: tags(subnetId),
+      });
+
+      const routeTable = ((): cdk.aws_ec2.CfnRouteTable => {
+        const routeTableId = `${subnetId}-route-table`;
+        const routeTable = new cdk.aws_ec2.CfnRouteTable(this, routeTableId, {
+          vpcId: vpc.ref,
+          tags: tags(routeTableId),
+        });
+
+        new cdk.aws_ec2.CfnSubnetRouteTableAssociation(
+          this,
+          `${routeTableId}-association`,
+          {
+            subnetId: subnet.ref,
+            routeTableId: routeTable.ref,
+          },
+        );
+
+        return routeTable;
+      })();
+
+      return { subnet, routeTable };
+    })();
+
+    const dbServerSecurityGroup = ((): cdk.aws_ec2.CfnSecurityGroup => {
+      const securityGroupId = `${DOMAIN_NAME}-db-server-security-group`;
+      const securityGroup = new cdk.aws_ec2.CfnSecurityGroup(
+        this,
+        securityGroupId,
+        {
+          groupDescription: "security group for db server",
+          vpcId: vpc.ref,
+          securityGroupIngress: [
+            {
+              ipProtocol: "tcp",
+              // TODO: クライアントのIPアドレスにする。環境変数にする
+              cidrIp: "0.0.0.0/0" satisfies CidrBlock,
+              fromPort: 22,
+              toPort: 22,
+            },
+            {
+              ipProtocol: "tcp",
+              cidrIp: "0.0.0.0/0" satisfies CidrBlock,
+              fromPort: 3306,
+              toPort: 3306,
+            },
+          ],
+          tags: tags(securityGroupId),
+        },
+      );
+
+      return securityGroup;
+    })();
+
+    const _dbServer = ((): cdk.aws_ec2.CfnInstance => {
+      const instanceId = `${DOMAIN_NAME}-db-server`;
+      const instance = new cdk.aws_ec2.CfnInstance(this, instanceId, {
+        networkInterfaces: [
+          {
+            deviceIndex: "1",
+            subnetId: dbServerSubnetAndRouteTable.subnet.ref,
+            privateIpAddress: "10.0.1.10" satisfies IpV4,
+            groupSet: [dbServerSecurityGroup.ref],
+          },
+        ],
+        imageId: instanceImageId,
+        instanceType,
+        // TODO: 環境変数
+        keyName: "MyKeyPair",
         tags: tags(instanceId),
       });
 
