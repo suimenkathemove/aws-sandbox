@@ -222,7 +222,7 @@ export class MinimumNetworkStack extends cdk.Stack {
       const instance = new cdk.aws_ec2.CfnInstance(this, instanceId, {
         networkInterfaces: [
           {
-            deviceIndex: "1",
+            deviceIndex: "0",
             subnetId: dbServerSubnetAndRouteTable.subnet.ref,
             privateIpAddress: "10.0.1.10" satisfies IpV4,
             groupSet: [dbServerSecurityGroup.ref],
