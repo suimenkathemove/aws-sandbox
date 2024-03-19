@@ -235,10 +235,6 @@ export class MinimumNetworkStack extends cdk.Stack {
         tags: tags(instanceId),
       });
 
-      const _eip = new cdk.aws_ec2.CfnEIP(this, `${instanceId}-eip`, {
-        instanceId: instance.ref,
-      });
-
       return instance;
     })();
   }
